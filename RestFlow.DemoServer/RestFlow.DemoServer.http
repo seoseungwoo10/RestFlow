@@ -1,0 +1,281 @@
+﻿@RestFlow.DemoServer_HostAddress = http://localhost:5245
+
+### 1. Health Check - Root Endpoint
+GET {{RestFlow.DemoServer_HostAddress}}/
+Accept: application/json
+
+###
+
+### 2. Non-Auth Test Endpoint
+GET {{RestFlow.DemoServer_HostAddress}}/api/no-auth/test
+Accept: application/json
+
+###
+
+### 3. Basic Authentication Test
+# Credentials: admin / password
+# Base64(admin:password) = YWRtaW46cGFzc3dvcmQ=
+GET {{RestFlow.DemoServer_HostAddress}}/api/basic-auth/test
+Authorization: Basic YWRtaW46cGFzc3dvcmQ=
+Accept: application/json
+
+###
+
+### 4. Bearer Token Test
+# Token: a-static-bearer-token-for-testing
+GET {{RestFlow.DemoServer_HostAddress}}/api/bearer-token/test
+Authorization: Bearer a-static-bearer-token-for-testing
+Accept: application/json
+
+###
+
+### 5. API Key (Header) Test
+# Header: X-API-KEY
+# Value: a-static-api-key
+GET {{RestFlow.DemoServer_HostAddress}}/api/api-key/header-test
+X-API-KEY: a-static-api-key
+Accept: application/json
+
+###
+
+### 6. API Key (Query Parameter) Test
+# Query param: api_key=a-static-api-key
+GET {{RestFlow.DemoServer_HostAddress}}/api/api-key/query-test?api_key=a-static-api-key
+Accept: application/json
+
+###
+
+### 7. OAuth 2.0 - Client Credentials Grant
+# Step 1: Request Access Token
+POST {{RestFlow.DemoServer_HostAddress}}/token
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=client_credentials&client_id=restflow-client&client_secret=restflow-secret&scope=read write
+
+###
+
+### 8. OAuth 2.0 - Access Protected Resource with JWT
+# NOTE: Replace <ACCESS_TOKEN> with the token from the previous request
+GET {{RestFlow.DemoServer_HostAddress}}/api/oauth/protected
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbGllbnRfY3JlZGVudGlhbHNfdXNlciIsImp0aSI6IjQ0NGMxMmFhLWQwOWYtNDUwYy05NDkyLWQ4NjBjMDM2MzRjNSIsImdyYW50X3R5cGUiOiJjbGllbnRfY3JlZGVudGlhbHMiLCJzY29wZSI6InJlYWQgd3JpdGUiLCJleHAiOjE3NjE4OTkwMTgsImlzcyI6IlJlc3RGbG93LkRlbW9TZXJ2ZXIiLCJhdWQiOiJSZXN0Rmxvdy5DbGllbnQifQ.PuwdIcFD66ktLL8bivkqsXWLgycI06DQMl6U8AoMgjQ
+Accept: application/json
+
+###
+
+### 9. OAuth 2.0 - Password Credentials Grant
+# Step 1: Request Access Token with Username/Password
+POST {{RestFlow.DemoServer_HostAddress}}/token
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=password&username=user&password=pass&client_id=restflow-client&client_secret=restflow-secret&scope=read write
+
+###
+
+### 10. OAuth 2.0 - Authorization Code Grant
+# Step 1: Exchange Authorization Code for Token
+POST {{RestFlow.DemoServer_HostAddress}}/token
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=authorization_code&code=static-auth-code-for-testing&client_id=restflow-client&client_secret=restflow-secret&redirect_uri=http://localhost
+
+###
+
+### 11. OAuth 2.0 - Refresh Token (Password Grant)
+# Step 1: Use refresh token to get new access token
+POST {{RestFlow.DemoServer_HostAddress}}/token
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=refresh_token&refresh_token=static-refresh-token-for-password-grant&client_id=restflow-client&client_secret=restflow-secret
+
+###
+
+### 12. OAuth 2.0 - Refresh Token (Authorization Code Grant)
+# Step 1: Use refresh token to get new access token
+POST {{RestFlow.DemoServer_HostAddress}}/token
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=refresh_token&refresh_token=static-refresh-token-for-auth-code-grant&client_id=restflow-client&client_secret=restflow-secret
+
+###
+
+### 13. Error Test - Basic Auth with Wrong Credentials
+GET {{RestFlow.DemoServer_HostAddress}}/api/basic-auth/test
+Authorization: Basic d3JvbmctdXNlcjp3cm9uZy1wYXNz
+Accept: application/json
+
+###
+
+### 14. Error Test - Bearer Token with Invalid Token
+GET {{RestFlow.DemoServer_HostAddress}}/api/bearer-token/test
+Authorization: Bearer invalid-token-for-testing
+Accept: application/json
+
+###
+
+### 15. Error Test - API Key with Wrong Key
+GET {{RestFlow.DemoServer_HostAddress}}/api/api-key/header-test
+X-API-KEY: wrong-api-key
+Accept: application/json
+
+###
+
+### 16. Error Test - OAuth with Wrong Client Credentials
+POST {{RestFlow.DemoServer_HostAddress}}/token
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=client_credentials&client_id=wrong-client&client_secret=wrong-secret
+
+###
+
+### 17. Error Test - OAuth with Wrong Username/Password
+POST {{RestFlow.DemoServer_HostAddress}}/token
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=password&username=wronguser&password=wrongpass&client_id=restflow-client&client_secret=restflow-secret
+
+###
+
+### 18. Error Test - OAuth with Invalid Authorization Code
+POST {{RestFlow.DemoServer_HostAddress}}/token
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=authorization_code&code=invalid-code&client_id=restflow-client&client_secret=restflow-secret&redirect_uri=http://localhost
+
+###
+
+### 19. Error Test - OAuth with Invalid Refresh Token
+POST {{RestFlow.DemoServer_HostAddress}}/token
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=refresh_token&refresh_token=invalid-refresh-token&client_id=restflow-client&client_secret=restflow-secret
+
+###
+
+### 20. Error Test - OAuth Protected Resource without Token
+GET {{RestFlow.DemoServer_HostAddress}}/api/oauth/protected
+Accept: application/json
+
+###
+
+### 21. Error Test - Unsupported Grant Type
+POST {{RestFlow.DemoServer_HostAddress}}/token
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=unsupported_grant&client_id=restflow-client&client_secret=restflow-secret
+
+###
+
+### ==========================================
+### Complete OAuth 2.0 Flow Test Scenarios
+### ==========================================
+
+### Scenario 1: Client Credentials Full Flow
+# Step 1: Get Access Token
+POST {{RestFlow.DemoServer_HostAddress}}/token
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=client_credentials&client_id=restflow-client&client_secret=restflow-secret&scope=read write
+
+# Step 2: Use the token from above to access protected resource
+# Copy the access_token value and replace <TOKEN> below
+###
+
+GET {{RestFlow.DemoServer_HostAddress}}/api/oauth/protected
+Authorization: Bearer <TOKEN>
+Accept: application/json
+
+###
+
+### Scenario 2: Password Grant Full Flow with Refresh
+# Step 1: Get Access Token with Password
+POST {{RestFlow.DemoServer_HostAddress}}/token
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=password&username=user&password=pass&client_id=restflow-client&client_secret=restflow-secret
+
+# Step 2: Access Protected Resource with Token
+# Copy the access_token value from above
+###
+
+GET {{RestFlow.DemoServer_HostAddress}}/api/oauth/protected
+Authorization: Bearer <TOKEN>
+Accept: application/json
+
+# Step 3: Refresh the Token
+# Use the refresh_token from Step 1
+###
+
+POST {{RestFlow.DemoServer_HostAddress}}/token
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=refresh_token&refresh_token=static-refresh-token-for-password-grant
+
+# Step 4: Access Protected Resource with New Token
+# Copy the new access_token value
+###
+
+GET {{RestFlow.DemoServer_HostAddress}}/api/oauth/protected
+Authorization: Bearer <NEW_TOKEN>
+Accept: application/json
+
+###
+
+### Scenario 3: Authorization Code Grant Full Flow with Refresh
+# Step 1: Exchange Auth Code for Token
+POST {{RestFlow.DemoServer_HostAddress}}/token
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=authorization_code&code=static-auth-code-for-testing&client_id=restflow-client&client_secret=restflow-secret&redirect_uri=http://localhost
+
+# Step 2: Access Protected Resource
+# Copy the access_token value from above
+###
+
+GET {{RestFlow.DemoServer_HostAddress}}/api/oauth/protected
+Authorization: Bearer <TOKEN>
+Accept: application/json
+
+# Step 3: Refresh the Token
+###
+
+POST {{RestFlow.DemoServer_HostAddress}}/token
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=refresh_token&refresh_token=static-refresh-token-for-auth-code-grant
+
+# Step 4: Access Protected Resource with Refreshed Token
+###
+
+GET {{RestFlow.DemoServer_HostAddress}}/api/oauth/protected
+Authorization: Bearer <NEW_TOKEN>
+Accept: application/json
+
+###
+
+### ==========================================
+### Quick Reference - Hardcoded Credentials
+### ==========================================
+
+# Basic Auth:
+#   Username: admin
+#   Password: password
+#   Base64: YWRtaW46cGFzc3dvcmQ=
+
+# Bearer Token:
+#   Token: a-static-bearer-token-for-testing
+
+# API Key:
+#   Header: X-API-KEY
+#   Query: api_key
+#   Value: a-static-api-key
+
+# OAuth 2.0:
+#   Client ID: restflow-client
+#   Client Secret: restflow-secret
+#   Username: user
+#   Password: pass
+#   Auth Code: static-auth-code-for-testing
+#   Refresh Token (Password): static-refresh-token-for-password-grant
+#   Refresh Token (Auth Code): static-refresh-token-for-auth-code-grant
+
+###
