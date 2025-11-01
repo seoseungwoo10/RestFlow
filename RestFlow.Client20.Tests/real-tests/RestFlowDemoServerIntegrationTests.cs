@@ -381,7 +381,7 @@ namespace RestFlow.Client20.Tests.RealTests
 
             // Act & Assert
             var exception = await Assert.ThrowsAsync<ApiException>(
-        async () => await client.GetAsync<AuthTestResponse>("/api/oauth/protected"));
+                async () => await client.GetAsync<AuthTestResponse>("/api/oauth/protected"));
 
             Assert.NotNull(exception);
         }
@@ -397,10 +397,10 @@ namespace RestFlow.Client20.Tests.RealTests
             var client = new RestFlowClient(_httpClient)
                     .WithBaseUrl(BaseUrl)
                          .WithOAuthAuthorizationCode(
-                 tokenEndpoint: $"{BaseUrl}/token",
-               refreshToken: "static-refresh-token-for-auth-code-grant",
-           clientId: "restflow-client",
-                      clientSecret: "restflow-secret");
+                tokenEndpoint: $"{BaseUrl}/token",
+                refreshToken: "static-refresh-token-for-auth-code-grant",
+                clientId: "restflow-client",
+                clientSecret: "restflow-secret");
 
             // Act
             var response = await client.GetAsync<AuthTestResponse>("/api/oauth/protected");
